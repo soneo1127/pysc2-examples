@@ -1,6 +1,6 @@
 import numpy as np
 from multiprocessing import Process, Pipe
-from baselines.common.vec_env import VecEnv
+from . import VecEnv
 from pysc2.env import environment
 from pysc2.env import sc2_env
 from pysc2.lib import features, actions
