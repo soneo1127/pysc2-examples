@@ -173,7 +173,7 @@ def main():
       env,
       seed,
       total_timesteps=num_timesteps,
-      nprocs=FLAGS.num_agents + FLAGS.num_scripts,
+      nprocs=FLAGS.num_agents,
       nscripts=FLAGS.num_scripts,
       ent_coef=0.5,
       nsteps=FLAGS.nsteps,

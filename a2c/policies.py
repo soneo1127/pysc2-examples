@@ -19,7 +19,7 @@ class CnnPolicy(object):
     nbatch = nenv * nsteps
     nh, nw, nc = (32, 32, 3)
     ob_shape = (nbatch, nh, nw, nc * nstack)
-    nact = 3  # 524
+    nact = 3 # 524
     # nsub3 = 2
     # nsub4 = 5
     # nsub5 = 10
@@ -37,33 +37,37 @@ class CnnPolicy(object):
     X = tf.placeholder(tf.uint8, ob_shape)  #obs
     with tf.variable_scope("model", reuse=reuse):
       with tf.variable_scope("common", reuse=reuse):
-        h = conv(
+        h = tf.nn.relu(conv(
             tf.cast(X, tf.float32),
             'c1',
             nf=32,
             rf=5,
             stride=1,
             init_scale=np.sqrt(2),
-            pad="SAME")  # ?, 32, 32, 16
-        h2 = conv(
+            pad="SAME"))  # ?, 32, 32, 16
+        h2 = tf.nn.relu(conv(
             h,
             'c2',
             nf=64,
             rf=3,
             stride=1,
             init_scale=np.sqrt(2),
-            pad="SAME")  # ?, 32, 32, 32
+            pad="SAME"))  # ?, 32, 32, 32
 
       with tf.variable_scope("pi1", reuse=reuse):
         h3 = conv_to_fc(h2)  # 131072
-        h4 = fc(h3, 'fc1', nh=256, init_scale=np.sqrt(2))  # ?, 256
+        print(h3.shape)
+        h4 = tf.nn.relu(fc(h3, 'fc1', nh=256, init_scale=np.sqrt(2)))  # ?, 256
+        print(h4.shape)
         pi_ = fc(
             h4, 'pi', nact)  # ( nenv * nsteps, 524) # ?, 524
         # leave act
         pi = tf.nn.softmax(pi_)
+        print(pi.shape)
 
         vf = fc(
             h4, 'v', 1)  # ( nenv * nsteps, 1) # ?, 1
+        print(vf.shape)
         # leave act
 
       # vf = tf.nn.l2_normalize(vf_, 1)
