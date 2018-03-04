@@ -7,7 +7,9 @@ import zipfile
 
 from absl import flags
 
+from baselines.deepq.utils import BatchInput, save_state, load_state
 import baselines.common.tf_util as U
+
 
 from baselines import logger
 from baselines.common.schedules import LinearSchedule
@@ -50,7 +52,7 @@ class ActWrapper(object):
         f.write(model_data)
 
       zipfile.ZipFile(arc_path, 'r', zipfile.ZIP_DEFLATED).extractall(td)
-      U.load_state(os.path.join(td, "model"))
+      load_state(os.path.join(td, "model"))
 
     return ActWrapper(act)
 
@@ -60,7 +62,7 @@ class ActWrapper(object):
   def save(self, path):
     """Save model to a pickle located at `path`"""
     with tempfile.TemporaryDirectory() as td:
-      U.save_state(os.path.join(td, "model"))
+      save_state(os.path.join(td, "model"))
       arc_name = os.path.join(td, "packed.zip")
       with zipfile.ZipFile(arc_name, 'w') as zipf:
         for root, dirs, files in os.walk(td):
@@ -190,7 +192,7 @@ def learn(env,
   sess.__enter__()
 
   def make_obs_ph(name):
-    return U.BatchInput((16, 16), name=name)
+    return BatchInput((16, 16), name=name)
 
   act_x, train_x, update_target_x, debug_x = deepq.build_train(
     make_obs_ph=make_obs_ph,
@@ -397,7 +399,7 @@ def learn(env,
           if print_freq is not None:
             logger.log("Saving model due to mean reward increase: {} -> {}".format(
               saved_mean_reward, mean_100ep_reward))
-          U.save_state(model_file)
+          save_state(model_file)
           model_saved = True
           saved_mean_reward = mean_100ep_reward
     if model_saved:
